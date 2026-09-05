@@ -11,7 +11,7 @@ import type { RootStackParamList } from "../../navigation/types";
 type Props = NativeStackScreenProps<RootStackParamList, "Share">;
 
 const APP_DOWNLOAD_URL =
-  "https://expo.dev/accounts/ankur724dev/projects/birthdaybash/builds/e944851b-1c17-4da5-9977-ac09192744c5";
+  "https://expo.dev/accounts/ankur724dev/projects/birthdaybash/builds/205b9ad8-d8c3-451b-9f97-64ee5fa44cf8";
 
 export default function ShareScreen({ navigation }: Props) {
   const { drop, reset } = useDrop();
