@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Open BirthdayBash</title>
+<style>
+  :root {
+    --bg: #0e0916;
+    --ink: #fdf6ec;
+    --muted: rgba(253, 246, 236, 0.68);
+    --soft: rgba(253, 246, 236, 0.12);
+    --accent: #ffd85c;
+    --pink: #ff4fa0;
+    --violet: #b283ff;
+    --blue: #7bd3ff;
+    --green: #8fd9a8;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background:
+      radial-gradient(circle at 48% 0%, rgba(255, 79, 160, 0.2), transparent 32rem),
+      radial-gradient(circle at 12% 86%, rgba(123, 211, 255, 0.14), transparent 26rem),
+      var(--bg);
+    color: var(--ink);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  body {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: max(12px, env(safe-area-inset-top)) 14px max(12px, env(safe-area-inset-bottom));
+  }
+
+  .shell {
+    width: min(100%, 440px);
+    text-align: center;
+  }
+
+  .mark {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 14px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, var(--pink), var(--accent));
+    color: #160b1f;
+    font-size: 30px;
+    font-weight: 900;
+    box-shadow: 0 18px 42px rgba(255, 79, 160, 0.25);
+    transform: rotate(-5deg);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(24px, 6.8vw, 34px);
+    line-height: 1.06;
+    letter-spacing: 0;
+  }
+
+  .sub {
+    margin: 10px auto 0;
+    max-width: 34ch;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .actions {
+    margin-top: 20px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .btn {
+    width: 100%;
+    min-height: 52px;
+    border: 0;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 18px;
+    color: #1a0f0a;
+    background: var(--accent);
+    font-weight: 900;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .btn.secondary {
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--soft);
+  }
+
+  .codeBox,
+  .game {
+    margin-top: 14px;
+    border: 1px solid var(--soft);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .codeBox { padding: 15px; }
+
+  .label {
+    margin: 0 0 9px;
+    color: rgba(253, 246, 236, 0.52);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .codeRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .code {
+    flex: 1;
+    min-width: 0;
+    padding: 13px 12px;
+    border-radius: 13px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--accent);
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: 4px;
+    overflow-wrap: anywhere;
+  }
+
+  .copy {
+    min-width: 82px;
+    height: 48px;
+    border: 1px solid rgba(253, 246, 236, 0.18);
+    border-radius: 13px;
+    background: rgba(253, 246, 236, 0.1);
+    color: var(--ink);
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .game {
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .gameTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .gameTitle {
+    margin: 0;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 900;
+    text-align: left;
+  }
+
+  .score {
+    min-width: 84px;
+    padding: 7px 9px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .partyStage {
+    position: relative;
+    height: clamp(132px, 32svh, 180px);
+    border-radius: 15px;
+    overflow: hidden;
+    background:
+      linear-gradient(rgba(14, 9, 22, 0.02), rgba(14, 9, 22, 0.5)),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 26px);
+    border: 1px solid rgba(253, 246, 236, 0.08);
+  }
+
+  .floor {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 13px;
+    height: 16px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.22);
+  }
+
+  .cakeTower {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    width: 84px;
+    height: 58px;
+    transform: translateX(-50%);
+  }
+
+  .cakeLayer {
+    position: absolute;
+    left: 0;
+    width: 84px;
+    height: 22px;
+    border-radius: 13px 13px 7px 7px;
+    background: linear-gradient(#ffe6af, #d99a51);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .cakeLayer.top { top: 0; }
+  .cakeLayer.mid { top: 18px; background: linear-gradient(#f5bc7c, #8b4e34); }
+  .cakeLayer.bot { top: 36px; }
+
+  .candle {
+    position: absolute;
+    left: 39px;
+    top: -17px;
+    width: 7px;
+    height: 22px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--violet) 0 50%, var(--accent) 50% 100%);
+  }
+
+  .flame {
+    position: absolute;
+    left: 36px;
+    top: -31px;
+    width: 14px;
+    height: 18px;
+    border-radius: 50% 50% 50% 0;
+    background: #ffcf4a;
+    transform: rotate(-45deg);
+    animation: flicker 700ms ease-in-out infinite alternate;
+  }
+
+  @keyframes flicker {
+    from { transform: rotate(-45deg) scale(0.9); filter: brightness(1); }
+    to { transform: rotate(-45deg) scale(1.12); filter: brightness(1.28); }
+  }
+
+  .balloon {
+    position: absolute;
+    width: 42px;
+    height: 54px;
+    border: 0;
+    border-radius: 50% 50% 47% 47%;
+    box-shadow: inset -8px -10px 0 rgba(0, 0, 0, 0.16), 0 12px 22px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+    animation: floaty 1800ms ease-in-out infinite alternate;
+  }
+
+  .balloon::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    bottom: -28px;
+    width: 1px;
+    height: 31px;
+    background: rgba(253, 246, 236, 0.45);
+  }
+
+  .balloon::before {
+    content: "";
+    position: absolute;
+    left: 13px;
+    bottom: -6px;
+    width: 14px;
+    height: 10px;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    background: inherit;
+  }
+
+  .balloon.popped {
+    animation: pop 240ms ease forwards;
+    pointer-events: none;
+  }
+
+  @keyframes floaty {
+    from { transform: translateY(0) rotate(-2deg); }
+    to { transform: translateY(-13px) rotate(3deg); }
+  }
+
+  @keyframes pop {
+    to { opacity: 0; transform: scale(1.9) rotate(18deg); }
+  }
+
+  .confetti {
+    position: absolute;
+    width: 7px;
+    height: 12px;
+    border-radius: 2px;
+    pointer-events: none;
+    animation: confetti 740ms ease forwards;
+  }
+
+  @keyframes confetti {
+    from { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    to { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(240deg); }
+  }
+
+  .progress {
+    height: 8px;
+    margin-top: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.22);
+  }
+
+  .progressFill {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--green), var(--accent), var(--pink));
+    transition: width 220ms ease;
+  }
+
+  .gameHint {
+    min-height: 17px;
+    margin: 9px 0 0;
+    color: rgba(253, 246, 236, 0.54);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .hint {
+    margin: 14px auto 0;
+    max-width: 34ch;
+    color: rgba(253, 246, 236, 0.52);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%) translateY(18px);
+    opacity: 0;
+    padding: 11px 14px;
+    border-radius: 999px;
+    background: var(--green);
+    color: #102015;
+    font-size: 13px;
+    font-weight: 900;
+    transition: opacity 180ms ease, transform 180ms ease;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 380px), (max-height: 720px) {
+    body {
+      align-items: start;
+      padding-top: max(10px, env(safe-area-inset-top));
+    }
+
+    .shell { max-width: 360px; }
+
+    .mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    h1 { font-size: 24px; }
+
+    .sub {
+      font-size: 13.5px;
+      line-height: 1.42;
+    }
+
+    .actions {
+      margin-top: 16px;
+      gap: 8px;
+    }
+
+    .btn {
+      min-height: 48px;
+      border-radius: 14px;
+      font-size: 15px;
+      padding: 12px 14px;
+    }
+
+    .codeBox,
+    .game {
+      margin-top: 10px;
+      border-radius: 15px;
+    }
+
+    .codeBox { padding: 12px; }
+
+    .code {
+      padding: 11px 10px;
+      font-size: 20px;
+      letter-spacing: 3px;
+    }
+
+    .copy {
+      min-width: 72px;
+      height: 44px;
+    }
+
+    .game { padding: 10px; }
+
+    .gameTop { margin-bottom: 8px; }
+
+    .gameTitle { font-size: 12.5px; }
+
+    .score {
+      min-width: 72px;
+      font-size: 11.5px;
+      padding: 6px 8px;
+    }
+
+    .partyStage {
+      height: 128px;
+      border-radius: 13px;
+    }
+
+    .balloon {
+      width: 36px;
+      height: 46px;
+    }
+
+    .cakeTower {
+      width: 74px;
+      height: 50px;
+      bottom: 22px;
+    }
+
+    .cakeLayer {
+      width: 74px;
+      height: 19px;
+    }
+
+    .cakeLayer.mid { top: 16px; }
+    .cakeLayer.bot { top: 32px; }
+
+    .candle {
+      left: 34px;
+      top: -15px;
+      height: 19px;
+    }
+
+    .flame {
+      left: 31px;
+      top: -28px;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 11.8px;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="shell">
+    <div class="mark">BB</div>
+    <h1>Someone made you a surprise</h1>
+    <p class="sub">Download BirthdayBash, copy the code, then open your birthday surprise.</p>
+
+    <div class="actions">
+      <a id="downloadBtn" class="btn" href="#" rel="noopener">Download BirthdayBash</a>
+      <a id="openBtn" class="btn secondary" href="#" rel="noopener">Open in app</a>
+    </div>
+
+    <section class="codeBox" aria-label="Birthday code">
+      <p class="label">Coupon code</p>
+      <div class="codeRow">
+        <div id="code" class="code">----</div>
+        <button id="copyBtn" class="copy" type="button">Copy</button>
+      </div>
+    </section>
+
+    <section class="game" aria-label="Waiting game">
+      <div class="gameTop">
+        <p id="gameTitle" class="gameTitle">Pop 7 balloons to light the cake</p>
+        <div id="score" class="score">0 / 7</div>
+      </div>
+      <div id="partyStage" class="partyStage">
+        <div class="floor"></div>
+        <div class="cakeTower" aria-hidden="true">
+          <div id="flame" class="flame" style="opacity: 0;"></div>
+          <div class="candle"></div>
+          <div class="cakeLayer top"></div>
+          <div class="cakeLayer mid"></div>
+          <div class="cakeLayer bot"></div>
+        </div>
+      </div>
+      <div class="progress"><div id="progressFill" class="progressFill"></div></div>
+      <p id="gameHint" class="gameHint">Tiny warm-up while the APK downloads.</p>
+    </section>
+
+    <p id="hint" class="hint">After installing the APK, open BirthdayBash and paste this code on the code screen.</p>
+  </main>
+
+  <div id="toast" class="toast">Code copied</div>
+
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var defaultDownloadUrl = "https://expo.dev/accounts/ankur724dev/projects/birthdaybash/builds/e944851b-1c17-4da5-9977-ac09192744c5";
+    var appTarget = params.get("to");
+    var downloadUrl = params.get("download") || params.get("apk") || defaultDownloadUrl;
+    var code = (params.get("code") || "").trim().toUpperCase();
+
+    var downloadBtn = document.getElementById("downloadBtn");
+    var openBtn = document.getElementById("openBtn");
+    var codeEl = document.getElementById("code");
+    var copyBtn = document.getElementById("copyBtn");
+    var hint = document.getElementById("hint");
+    var toast = document.getElementById("toast");
+    var stage = document.getElementById("partyStage");
+    var scoreEl = document.getElementById("score");
+    var gameTitle = document.getElementById("gameTitle");
+    var gameHint = document.getElementById("gameHint");
+    var progressFill = document.getElementById("progressFill");
+    var flame = document.getElementById("flame");
+    var popped = 0;
+    var targetPops = 7;
+    var colors = ["#ff4fa0", "#ffd85c", "#7bd3ff", "#8fd9a8", "#b283ff"];
+    var lines = [
+      "Nice. One birthday balloon down.",
+      "That balloon had no chance.",
+      "Careful, you are becoming too powerful.",
+      "Cake loading. Drama increasing.",
+      "The candle is getting nervous.",
+      "Almost there. One more pop.",
+      "Cake lit. Birthday mode unlocked."
+    ];
+
+    if (downloadUrl) {
+      downloadBtn.href = downloadUrl;
+    } else {
+      downloadBtn.textContent = "APK link not added yet";
+      downloadBtn.removeAttribute("href");
+      downloadBtn.style.opacity = "0.72";
+    }
+
+    if (appTarget) {
+      openBtn.href = appTarget;
+    } else {
+      openBtn.textContent = "Open app after install";
+      openBtn.removeAttribute("href");
+      openBtn.style.opacity = "0.72";
+    }
+
+    if (code) {
+      codeEl.textContent = code;
+    } else {
+      codeEl.textContent = "NO CODE";
+      copyBtn.disabled = true;
+      copyBtn.style.opacity = "0.55";
+      
+    }
+
+    copyBtn.addEventListener("click", function () {
+      if (!code) return;
+
+      function showCopied() {
+        copyBtn.textContent = "Copied";
+        toast.classList.add("show");
+        setTimeout(function () {
+          copyBtn.textContent = "Copy";
+          toast.classList.remove("show");
+        }, 1400);
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(showCopied, showCopied);
+      } else {
+        var input = document.createElement("input");
+        input.value = code;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        document.body.removeChild(input);
+        showCopied();
+      }
+    });
+
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function addConfetti(x, y) {
+      for (var i = 0; i < 12; i += 1) {
+        var bit = document.createElement("span");
+        bit.className = "confetti";
+        bit.style.left = x + "px";
+        bit.style.top = y + "px";
+        bit.style.background = colors[i % colors.length];
+        bit.style.setProperty("--dx", rand(-70, 70) + "px");
+        bit.style.setProperty("--dy", rand(-85, 45) + "px");
+        stage.appendChild(bit);
+        setTimeout(function (node) { node.remove(); }, 780, bit);
+      }
+    }
+
+    function placeBalloon(balloon) {
+      var bounds = stage.getBoundingClientRect();
+      balloon.style.left = rand(14, bounds.width - 56) + "px";
+      balloon.style.top = rand(12, 72) + "px";
+      balloon.style.animationDelay = rand(-1.4, 0) + "s";
+    }
+
+    function spawnBalloon(delay) {
+      setTimeout(function () {
+        if (popped >= targetPops) return;
+        var balloon = document.createElement("button");
+        balloon.type = "button";
+        balloon.className = "balloon";
+        balloon.setAttribute("aria-label", "Pop balloon");
+        balloon.style.background = colors[Math.floor(Math.random() * colors.length)];
+        placeBalloon(balloon);
+        stage.appendChild(balloon);
+
+        balloon.addEventListener("click", function () {
+          if (balloon.classList.contains("popped")) return;
+          popped += 1;
+          balloon.classList.add("popped");
+          addConfetti(balloon.offsetLeft + 20, balloon.offsetTop + 24);
+          scoreEl.textContent = Math.min(popped, targetPops) + " / " + targetPops;
+          progressFill.style.width = Math.min(100, (popped / targetPops) * 100) + "%";
+          gameHint.textContent = lines[Math.min(popped - 1, lines.length - 1)];
+          if (popped >= targetPops) {
+            flame.style.opacity = "1";
+            gameTitle.textContent = "Birthday cake is ready";
+            gameHint.textContent = "Now install the app and claim the surprise.";
+            return;
+          }
+          setTimeout(function () { balloon.remove(); }, 220);
+          spawnBalloon(110);
+        });
+      }, delay);
+    }
+
+    for (var i = 0; i < 3; i += 1) {
+      spawnBalloon(i * 180);
+    }
+  </script>
+</body>
+</html>

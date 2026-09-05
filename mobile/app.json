@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "BirthdayBash",
+    "slug": "birthdaybash",
+    "scheme": "birthdaybash",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0E0916",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.ankur724dev.birthdaybash"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Let BirthdayBash pick a photo for the cake smash."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "4481d8ad-9ed1-44a3-aca4-4038425c8933"
+      }
+    }
+  }
+}

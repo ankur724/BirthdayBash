@@ -1,0 +1,17 @@
+# Backend (Python)
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.env
+backend/static/uploads/*
+!backend/static/uploads/.gitkeep
+
+# Mobile (handled in mobile/.gitignore, repeated here for root-level tools)
+mobile/node_modules/
+mobile/.expo/
+mobile/.env
+
+# OS
+.DS_Store
+
+*.md
